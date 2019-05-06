@@ -1,5 +1,8 @@
 {
-  "pages": ["pages/index/main", "pages/logs/main"],
+  "pages": [
+    "pages/index/main",
+    "pages/logs/main"
+  ],
   "window": {
     "navigationBarBackgroundColor": "#ea4451",
     "navigationBarTitleText": "优购"
@@ -9,7 +12,6 @@
     "backgroundColor": "#fff",
     "selectedColor": "#ea4451",
     "borderStyle": "black",
-
     "list": [
       {
         "text": "首页",
