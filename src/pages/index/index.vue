@@ -3,9 +3,9 @@
     <!-- 搜索 -->
     <div class="search">
       <!-- 搜索框 -->
-      <div class="input-box"
-           placeholder="请输入商品">
-        <input type="text">
+      <div class="input-box">
+        <input type="text"
+               placeholder="请输入商品">
       </div>
       <!-- 搜索结果 -->
       <div class="result"></div>
@@ -17,98 +17,37 @@
             circular
             indicator-color="rgba(255,255,255,.6)"
             indicator-active-color="#fff">
-      <swiper-item>
-        <navigator url="">
-          <image src="/static/uploads/banner1.png">
-          </image>
-        </navigator>
-      </swiper-item>
-      <swiper-item>
-        <navigator url="">
-          <image src="/static/uploads/banner2.png">
-          </image>
-        </navigator>
-      </swiper-item>
-      <swiper-item>
-        <navigator url="">
-          <image src="/static/uploads/banner3.png">
+      <swiper-item v-for="(list,key) in bannerList"
+                   :key="key">
+        <navigator :url="list.navigator_url">
+          <image :src="list.image_src">
           </image>
         </navigator>
       </swiper-item>
     </swiper>
     <!-- 导航 -->
     <div class="navs">
-      <navigator url="">
-        <image src="/static/uploads/icon_index_nav_1@2x.png">
-        </image>
-      </navigator>
-      <navigator url="">
-        <image src="/static/uploads/icon_index_nav_2@2x.png">
-        </image>
-      </navigator>
-      <navigator url="">
-        <image src="/static/uploads/icon_index_nav_3@2x.png">
-        </image>
-      </navigator>
-      <navigator url="">
-        <image src="/static/uploads/icon_index_nav_4@2x.png">
+      <navigator :url="list.navigator_url"
+                 v-for="(list,key) in navList"
+                 :key="key">
+        <image :src="list.image_src">
         </image>
       </navigator>
     </div>
     <!-- 楼层 -->
     <div class="floors">
-      <div class="floor">
+      <div class="floor"
+           v-for="(list , key) in floorList"
+           :key="key">
         <div class="title">
-          <image src="/static/uploads/pic_floor02_title.png">
+          <image :src="list.floor_title.image_src">
           </image>
         </div>
         <div class="pics">
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_1@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_2@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_3@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_4@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_5@2x.png">
-            </image>
-          </navigator>
-        </div>
-      </div>
-      <div class="floor">
-        <div class="title">
-          <image src="/static/uploads/pic_floor02_title.png">
-          </image>
-        </div>
-        <div class="pics">
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_1@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_2@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_3@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_4@2x.png">
-            </image>
-          </navigator>
-          <navigator url="">
-            <image src="/static/uploads/pic_floor02_5@2x.png">
+          <navigator :url="item.navigator_url"
+                     v-for="(item,index) in list.product_list"
+                     :key="index">
+            <image :src="item.image_src">
             </image>
           </navigator>
         </div>
@@ -118,18 +57,81 @@
 </template>
 
 <script>
+// 导入 Promise 模块
+import request from '@/utils/request.js'
 export default {
+  data () {
+    return {
+      bannerList: [],
+      navList: [],
+      floorList: []
+    }
+  },
 
+  methods: {
+    //焦点图接口
+    async getBanner () {
+      //！！！传统异步
+      // var _this = this
+      // mpvue.request({
+      //   url: 'https://www.zhengzhicheng.cn/api/public/v1/home/swiperdata',
+      //   success: function (info) {
+      //     // console.log(info)
+      //     _this.bannerList = info.data.message
+      //   }
+      // })
+      let { message } = await request({ url: '/api/public/v1/home/swiperdata' })
+      this.bannerList = message
+
+    },
+    //导航接口
+    async getNavs () {
+      //！！！传统异步
+      // var _this = this
+      // mpvue.request({
+      //   url: 'https://www.zhengzhicheng.cn/api/public/v1/home/catitems',
+      //   success: function (info) {
+      //     // console.log(info)
+      //     _this.navList = info.data.message
+      //   }
+      // })
+      let { message } = await request({
+        url: '/api/public/v1/home/catitems'
+      })
+      this.navList = message
+    },
+    //楼层接口
+    async getFloors () {
+      let { message } = await request({
+        url: '/api/public/v1/home/floordata'
+      })
+      console.log(message)
+      this.floorList = message
+    }
+  },
+
+  mounted () {
+    console.log('发起请求')
+    this.getBanner()
+    this.getNavs()
+    this.getFloors()
+  }
 }
 </script>
 
-<style scoped>
+<style scoped lang = "less">
+/* 在 vue 中使用less需要安装 */
+/* less-loader、less 并且要配置 */
+/* 在mpvue只需安装，无需配置 */
+
 /* 搜索 */
 .search {
 }
-.search .input-box {
-  background-color: #ee4451;
-  padding: 20rpx 30rpx;
+.search {
+  .input-box {
+    background-color: #ee4451;
+    padding: 20rpx 30rpx;
+  }
 }
 .search .input-box input {
   height: 75rpx;
@@ -154,7 +156,7 @@ export default {
 .navs {
   display: flex;
   justify-content: space-around;
-  padding-top: 30rpx;
+  padding: 20rpx 0;
 }
 .navs navigator {
   width: 128rpx;
